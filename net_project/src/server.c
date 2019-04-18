@@ -5,7 +5,7 @@
 
 #define SIZE 	150				//缓冲区的大小
 #define SERVER_PORT  8808			//服务器的端口号
-#define SERVER_IP  "10.10.10.114"		//服务器IP
+#define SERVER_IP  "192.168.90.8"		//服务器IP
 #define LISTEN_LENTH 10				//监听最大请求数
 
 
