@@ -1,0 +1,7 @@
+
+ifeq ($(target_os), $(filter $(target_os),linux))
+    cflags:=$(cflags) -Dmrtsp_ssl_enable=1
+endif
+
+libs:= $(libs) -lmsdp$(target_debug) -lmcore$(target_debug)
+

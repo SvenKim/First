@@ -1,0 +1,47 @@
+
+ifeq ($(strip $(gm8298_sdk_root)),)
+  gm8298_sdk_root=/faraday
+endif
+ifeq ($(strip $(gm8298_tool_chain_root)),)
+  gm8298_tool_chain_root=$(gm8298_sdk_root)/toolchain_gnueabi-4.9.x_CA7
+endif
+ifeq ($(strip $(gm8298_linux_sysroot)),)
+  gm8298_linux_sysroot=$(gm8298_tool_chain_root)/usr/arm-none-linux-gnueabi/sysroot
+endif
+ifeq ($(strip $(gm8298_linux_kernel_root)),)
+   gm8298_linux_kernel_root=$(frameworks_root)/../kernel/gm8298
+endif
+ifeq ($(strip $(gm8298_linux_kernel_src_path)),)
+   gm8298_linux_kernel_src_path=$(gm8298_linux_kernel_root)/arm-linux-3.16/
+endif
+ifeq ($(strip $(gm8298_linux_kernel_module_src_path)),)
+  gm8298_linux_kernel_module_src_path=$(gm8298_linux_kernel_src_path)/module
+endif
+ifeq ($(strip $(gm8298_lib_path)),)
+   gm8298_lib_path=$(gm8298_linux_kernel_root)/gm_graph/gm_lib
+endif
+
+ifeq ($(filter armv4 armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__gm8298__ -D__embed_dev__ \
+	-I$(gm8298_linux_sysroot)/include \
+	-I$(gm8298_lib_path)/inc \
+	-I$(gm8298_linux_kernel_module_src_path)/include
+
+
+ldflags:=$(ldflags) -L${gm8298_linux_sysroot}/lib -L${gm8298_lib_path}/lib
+
+ifeq ($(filter toolchain_gnueabi-4.9.x_CA7,$(LD_LIBRARY_PATH)),)
+  cross_compile:=LD_LIBRARY_PATH=$(gm8298_tool_chain_root)/usr/lib:$(LD_LIBRARY_PATH) $(gm8298_tool_chain_root)/usr/bin/arm-linux-
+else
+  cross_compile:=$(gm8298_tool_chain_root)/usr/bin/arm-linux-
+endif
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

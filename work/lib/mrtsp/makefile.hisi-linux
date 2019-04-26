@@ -1,0 +1,38 @@
+#prepre hisi sdk
+
+ifeq ($(strip $(hisi_sdk_root)),)
+  hisi_sdk_root:=/hisi/Hi3511_VSSDK_V1.1.2.3
+endif
+
+ifeq ($(strip $(hisi_tool_chain_root)),)
+  hisi_tool_chain_root=/opt/hisi-linux/x86-arm/gcc-3.4.3-uClibc-0.9.28
+endif
+
+ifeq ($(strip $(hisi_linux_sysroot)),)
+  hisi_linux_sysroot=$(hisi_tool_chain_root)/usr
+endif
+
+ifeq ($(strip $(hisi_osdrv)),)
+  hisi_osdrv:= 
+endif
+
+hisi_drv_path:=$(hisi_sdk_root)/$(hisi_osdrv)/source/drv
+hisi_lib_path:=$(hisi_sdk_root)/mpp/lib.rel
+
+ifeq ($(filter armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__hisi__	-D__embed_dev__ 
+
+ldflags:=$(ldflags)
+
+cross_compile:=$(hisi_tool_chain_root)/bin/arm-hisi-linux-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+
+

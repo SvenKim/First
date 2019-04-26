@@ -1,0 +1,31 @@
+
+ifeq ($(strip $(nt98515_sdk_root)),)
+  nt98515_sdk_root=$(frameworks_root)/../kernel/nt98515
+endif
+ifeq ($(strip $(nt98515_tool_chain_root)),)
+  nt98515_tool_chain_root=$(nt98515_sdk_root)/toolchain/mipsel-24kec-linux-uclibc-4.9-2017.07
+endif
+ifeq ($(strip $(nt98515_linux_kernel_root)),)
+   nt98515_linux_kernel_root=$(frameworks_root)/../kernel/nt98515
+endif
+ifeq ($(strip $(nt98515_linux_kernel_src_path)),)
+   nt98515_linux_kernel_src_path=$(nt98515_linux_kernel_root)/mipsel-linux
+endif
+ifeq ($(strip $(nt98515_linux_kernel_module_src_path)),)
+  nt98515_linux_kernel_module_src_path=$(nt98515_linux_kernel_src_path)/
+endif
+
+
+cflags:=$(cflags) -D__nt98515__ -D__embed_dev__ -D__mips__ \
+	-I$(nt98515_linux_kernel_module_src_path)/source/include
+
+ldflags:=$(ldflags) -L$(nt98515_linux_kernel_module_src_path)/source/lib
+
+cross_compile:=$(nt98515_tool_chain_root)/usr/bin/mipsel-24kec-linux-uclibc-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

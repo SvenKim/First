@@ -1,0 +1,33 @@
+
+
+ifeq ($(strip $(sdk_root)),)
+  sdk_root=/fullhan
+endif
+ifeq ($(strip $(tool_chain_root)),)
+  tool_chain_root=/opt/fullhan/toolchain
+endif
+ifeq ($(strip $(kernel_root)),)
+   kernel_root=$(frameworks_root)/../kernel/fh8830
+endif
+ifeq ($(strip $(kernel_src_path)),)
+   kernel_src_path=$(kernel_root)/sdk_fh8830/board_support/kernel/linux-3.0.8
+endif
+
+#arm1176
+ifeq ($(filter armv6,$(target_arch)),)
+  target_arch:=armv6
+endif
+
+cflags:=$(cflags) -D__fh8830__ -D__embed_dev__\
+        -I$(kernel_root)/sdk_fh8830/media_support/include 
+
+ldflags:=$(ldflags) -L$(kernel_root)/sdk_fh8830/media_support/lib
+
+cross_compile:=$(tool_chain_root)/arm-fullhan-linux-uclibcgnueabi/bin/arm-fullhan-linux-uclibcgnueabi-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

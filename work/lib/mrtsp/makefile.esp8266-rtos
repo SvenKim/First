@@ -1,0 +1,54 @@
+
+ifeq ($(strip $(sdk_root)),)
+  sdk_root=/root/project/src/kernel/esp8266/ESP8266_RTOS_SDK
+endif
+ifeq ($(strip $(tool_chain_root)),)
+  tool_chain_root=/root/project/src/kernel/esp8266/xtensa-lx106-elf
+endif
+
+#arm1176
+ifeq ($(filter xtensa,$(target_arch)),)
+  target_arch:=xtensa
+endif
+
+cflags:=$(cflags) -D__rtos__ -D__embed_dev__ -D__esp8266__ -Dmframework_enable_mosal\
+	-D_mprint_time2s_miss -Os -D__WORDSIZE=32 -DICACHE_FLASH -Dmemmin -Dmemmin -Dflashmin -Dmmq_dump_enable=0 \
+	-DLWIP_TIMEVAL_PRIVATE=0 -D_mprintf_debug_enable=0 -DUSE_MBEDTLS -Dprint_level=0\
+	-Dmwfc_recver_enable=1 \
+	-DUSER_DEF_PRINTF \
+	-fno-inline-functions	\
+	-nostdlib       \
+	-mlongcalls	\
+	-mtext-section-literals \
+	-ffunction-sections \
+	-fdata-sections	\
+	-fno-builtin-printf	\
+	-fno-jump-tables \
+	-I$(sdk_root)/include/ \
+	-I$(sdk_root)/include/freertos \
+	-I$(sdk_root)/include/lwip/ \
+	-I$(sdk_root)/include/lwip/posix/ \
+	-I$(sdk_root)/include/lwip/ipv4/ \
+	-I$(sdk_root)/include/lwip/ipv6/ \
+	-I$(sdk_root)/extra_include/ \
+	-I$(sdk_root)/driver_lib/include/ \
+	-I$(sdk_root)/include/espressif/
+
+ldflags:=$(ldflags) -L$(sdk_root)/lib -nostdlib -Wl,El \
+	-fno-inline-functions	\
+	-nostdlib       \
+	-mlongcalls	\
+	-mtext-section-literals \
+	-ffunction-sections \
+	-fdata-sections	\
+	-fno-builtin-printf	\
+	-fno-jump-tables
+
+cross_compile:=$(tool_chain_root)/bin/xtensa-lx106-elf-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

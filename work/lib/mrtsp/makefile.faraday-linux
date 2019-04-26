@@ -1,0 +1,37 @@
+
+ifeq ($(strip $(faraday_sdk_root)),)
+  faraday_sdk_root=/faraday
+endif
+#export PATH=$(faraday_sdk_root)/arm-none-linux-gnueabi-4.4.0_ARMv5TE/bin:$PATH
+ifeq ($(strip $(faraday_tool_chain_root)),)
+  faraday_tool_chain_root=$(faraday_sdk_root)/arm-none-linux-gnueabi-4.4.0_ARMv5TE
+endif
+ifeq ($(strip $(faraday_linux_sysroot)),)
+  faraday_linux_sysroot=$(faraday_tool_chain_root)/arm-none-linux-gnueabi
+endif
+ifeq ($(strip $(faraday_linux_kernel_root)),)
+   faraday_linux_kernel_root=$(frameworks_root)/../kernel/gm8126
+endif
+ifeq ($(strip $(faraday_linux_kernel_src_path)),)
+   faraday_linux_kernel_src_path=$(faraday_linux_kernel_root)/arm-linux-2.6.28
+endif
+ifeq ($(strip $(faraday_linux_kernel_module_src_path)),)
+  faraday_linux_kernel_module_src_path=$(faraday_linux_kernel_src_path)/module
+endif
+
+ifeq ($(filter armv4 armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__faraday__ -D__embed_dev__ -I$(faraday_linux_kernel_module_src_path)/include
+
+ldflags:=$(ldflags)
+
+cross_compile:=$(faraday_tool_chain_root)/bin/arm-none-linux-gnueabi-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

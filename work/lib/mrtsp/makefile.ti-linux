@@ -1,0 +1,34 @@
+
+#export PATH=/ti/dm36x/Source/dvsdk_ipnctools/linux-devkit/bin/:$PATH
+ifeq ($(strip $(ti_sdk_root)),)
+  ti_sdk_root=/ti/dm36x/Source
+endif
+
+ifeq ($(strip $(ti_tool_chain_root)),)
+  ti_tool_chain_root=$(ti_sdk_root)/dvsdk_ipnctools/linux-devkit
+endif
+
+ifeq ($(strip $(ti_linux_sysroot)),)
+  ti_linux_sysroot=$(ti_tool_chain_root)/arm-arago-linux-gnueabi/usr
+endif
+
+ifeq ($(strip $(ti_ipnc_framework_path)),)
+  ti_ipnc_framework_path=$(ti_sdk_root)/ipnc_rdk/av_capture/framework
+endif
+
+ifeq ($(filter armv4 armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__ti__	-D__embed_dev__ 
+
+ldflags:=$(ldflags)
+
+cross_compile:=$(ti_tool_chain_root)/bin/arm-arago-linux-gnueabi-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

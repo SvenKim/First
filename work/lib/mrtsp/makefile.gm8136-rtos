@@ -1,0 +1,33 @@
+
+ifeq ($(strip $(sdk_root)),)
+  sdk_root=/root/project/src/kernel/gm8136rt/software
+endif
+ifeq ($(strip $(tool_chain_root)),)
+  tool_chain_root=/root/project/src/kernel/gm8136rt/arm-none-eabi-gcc-4.6.4
+endif
+
+#arm1176
+ifeq ($(filter armv5,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__rtos__ -D__embed_dev__ -D__gm8136rt__ -DCOMP_GCC\
+	-D_MPRINTF_DEBUG_DISABLE -D_mprint_time2s_miss \
+	-mcpu=fa626te -DCOMP_GCC -msoft-float -ULINUX  -fno-omit-frame-pointer\
+	-I$(sdk_root)/include/ \
+	-I$(sdk_root)/os/FreeRTOS/Source/include/ \
+	-I$(sdk_root)/os/FreeRTOS/Source/portable/RVDS/GM/ \
+	-I$(sdk_root)/mw/lwip_g/src/include/ \
+	-I$(sdk_root)/mw/lwip_g/ports/include/ \
+	-I$(sdk_root)/mw/lwip_g/src/include/ipv4/ \
+
+ldflags:=$(ldflags) -L$(sdk_root)/lib
+
+cross_compile:=$(tool_chain_root)/bin/arm-none-eabi-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

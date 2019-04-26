@@ -1,0 +1,30 @@
+
+ifeq ($(strip $(gm8135_sdk_root)),)
+  gm8135_sdk_root=/faraday
+endif
+ifeq ($(strip $(gm8135_tool_chain_root)),)
+  gm8135_tool_chain_root=$(gm8135_sdk_root)/toolchain_gnueabi-4.4.0_ARMv5TE/usr
+endif
+ifeq ($(strip $(gm8135_linux_kernel_root)),)
+   gm8135_linux_kernel_root=$(frameworks_root)/../kernel/gm8135_v2
+endif
+ifeq ($(strip $(gm8135_linux_kernel_src_path)),)
+   gm8135_linux_kernel_src_path=$(gm8135_linux_kernel_root)/arm-linux-3.3
+endif
+
+ifeq ($(filter armv4 armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__gm8135__ -D__gm8135_v2__ -D__embed_dev__ -fno-omit-frame-pointer
+
+ldflags:=$(ldflags) 
+
+cross_compile:=$(gm8135_tool_chain_root)/bin/arm-unknown-linux-uclibcgnueabi-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

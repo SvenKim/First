@@ -1,0 +1,22 @@
+ifeq ($(macosx_ver_min),)
+  macosx_ver_min:=10.6
+endif
+
+ifneq ($(target_arch),)
+  cflags:=$(cflags) -arch $(target_arch) -mmacosx-version-min=$(macosx_ver_min)
+  ldflags:=$(ldflags) -arch $(target_arch) -mmacosx-version-min=$(macosx_ver_min)
+endif
+
+#set suffix as dylib
+ifeq ($(strip $(so_suffix)),)
+  so_suffix:=.dylib
+endif
+
+#hack ios-universal
+ifeq ($(strip $(target_arch)), universal)
+  objs_keep:=true
+  objs_out_dir=$(if $(filter a so,$(target_type)),lib,bin)
+  objs=$(arch_path)/../darwin-x86_64/$(objs_out_dir)/$(target_file) $(arch_path)/../darwin-i386/$(objs_out_dir)/$(target_file)
+  target_build=lipo -output $(target) -create -arch x86_64 $(arch_path)/../darwin-x86_64/$(objs_out_dir)/$(target_file) -arch i386 $(arch_path)/../darwin-i386/$(objs_out_dir)/$(target_file)
+endif
+

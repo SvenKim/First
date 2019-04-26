@@ -1,0 +1,117 @@
+#prepre ios sdk
+
+ifeq ($(filter armv7 armv7s arm64 i386 x86_64 universal,$(target_arch)),)
+  target_arch:=armv7
+endif
+
+ifeq (/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer, $(wildcard /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer))
+  ios_platforms_root:=/Applications/Xcode.app/Contents/Developer/Platforms
+else
+  ios_platforms_root:=/Developer/Platforms
+endif
+ios_sdk_ver_detected:=$(shell ls "$(ios_platforms_root)/iPhoneOS.platform/Developer/SDKs/" \
+      | grep iPhoneOS | grep sdk | tail -n 1 | sed "s/^.*iPhoneOS//" | sed "s/.sdk//")
+
+
+ifeq ($(strip $(ios_sdk_ver)),)
+  ios_sdk_ver:=$(ios_sdk_ver_detected)
+endif
+ifeq ($(ios_ver_min),)
+  ios_ver_min:=5.0
+endif
+ifneq ($(filter arm64 x86_64,$(target_arch)),)
+  ifeq ($(shell if [ 1 == "`echo $(ios_ver_min) \< 7.0 | bc`" ]; then echo lt7; fi;),lt7)
+    ios_ver_min=7.0
+  endif
+endif
+
+ifneq ($(filter armv7 armv7s arm64,$(target_arch)),)
+  ios_root=$(ios_platforms_root)/iPhoneOS.platform/Developer
+  ios_sdk_root:=$(ios_root)/SDKs/iPhoneOS$(ios_sdk_ver).sdk
+  cflags:=$(cflags) -arch $(target_arch) -miphoneos-version-min=$(ios_ver_min) -I$(ios_sdk_root)/usr/include/ 
+  ldflags:=$(ldflags) -arch $(target_arch)  -miphoneos-version-min=$(ios_ver_min)
+endif
+ifneq ($(filter i386 x86_64,$(target_arch)),)
+  ios_root=$(ios_platforms_root)/iPhoneSimulator.platform/Developer
+  ios_sdk_root:=$(ios_root)/SDKs/iPhoneSimulator$(ios_sdk_ver).sdk
+  cflags:=$(cflags) -arch $(target_arch) -miphoneos-version-min=$(ios_ver_min) -I$(ios_sdk_root)/usr/include/ 
+  ldflags:=$(ldflags) -arch $(target_arch) -miphoneos-version-min=$(ios_ver_min) 
+endif
+ifneq ($(target_arch),)
+  cflags:=$(cflags) -isysroot $(ios_sdk_root)
+  ldflags:=$(ldflags) -L$(ios_sdk_root)/usr/lib/system
+  ifeq ($(cross_compile),)
+    ifeq ($(shell if [ 1 == "`echo $(ios_sdk_ver_detected) \< 7.0 | bc`" ]; then echo lt7; fi;),lt7)
+      cross_compile:=$(ios_root)/usr/bin/
+    else
+      #cross_compile:=/Applications/Xcode.app/Contents/Developer/usr/bin/
+    endif
+  endif
+endif
+ifeq ($(strip $(target_type)),)
+  target_type:=a
+endif
+
+
+#hack ios-universal
+ifeq ($(strip $(target_arch)),universal)
+  objs_keep:=true
+  #zhengxianwei
+  obj_arch_arm64=$(arch_path)/../ios-arm64/lib/$(target_file)
+  obj_arch_x86_64=$(arch_path)/../ios-x86_64/lib/$(target_file)
+  ifeq ($(shell if [ 1 == "`echo $(ios_sdk_ver_detected) \< 7.0 | bc`" ]; then echo lt7; fi;),lt7)
+    obj_arch_arm64=
+    obj_arch_x86_64=
+  endif
+  objs=$(arch_path)/../ios-armv7/lib/$(target_file) \
+       $(arch_path)/../ios-armv7s/lib/$(target_file) \
+       $(obj_arch_arm64) \
+       $(arch_path)/../ios-i386/lib/$(target_file) \
+       $(obj_arch_x86_64) 
+  target_build=lipo -output $(target) -create \
+       $(arch_path)/../ios-armv7/lib/$(target_file) \
+       $(arch_path)/../ios-armv7s/lib/$(target_file) \
+       $(obj_arch_arm64) \
+       $(arch_path)/../ios-i386/lib/$(target_file) \
+       $(obj_arch_x86_64) 
+endif
+
+
+#prepare compile util
+ifeq ($(strip $(cc)),)
+  cc:=gcc
+  ifneq ($(cross_compile),)
+    cc:=$(cross_compile)gcc
+  endif
+endif
+ifeq ($(strip $(ar)),)
+  ar:=ar
+  ifneq ($(cross_compile),)
+    ar:=$(cross_compile)ar
+  endif
+endif
+ifeq ($(strip $(ranlib)),)
+  ranlib:=ranlib -no_warning_for_no_symbols
+  ifneq ($(cross_compile),)
+    ranlib:=$(cross_compile)ranlib -no_warning_for_no_symbols
+  endif
+endif
+ifeq ($(strip $(cxx)),)
+  cxx:=g++
+  ifneq ($(cross_compile),)
+    cxx:=$(cross_compile)g++
+  endif
+endif
+ifeq ($(strip $(as)),)
+  as:=gcc
+  ifneq ($(cross_compile),)
+    as:=$(cross_compile)gcc
+  endif
+endif
+ifeq ($(strip $(objc)),)
+  objc:=clang
+endif
+ifeq ($(strip $(objcxx)),)
+  objcxx:=clang
+endif
+

@@ -1,0 +1,20 @@
+
+ifeq ($(strip $(mt7688_sdk_root)),)
+  mt7688_sdk_root=$(frameworks_root)/../kernel/mt7688/
+endif
+
+ifeq ($(strip $(mt7688_tool_chain_root)),)
+  mt7688_tool_chain_root=$(mt7688_sdk_root)/OpenWrt-Toolchain-ramips-mt7688_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2
+endif
+
+cflags:=$(cflags) -D__mt7688__ -D__mips__ -D__embed_dev__ 
+ldflags:=$(ldflags) -ldl
+ 
+cross_compile:=$(mt7688_tool_chain_root)/bin/mipsel-openwrt-linux-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)as
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

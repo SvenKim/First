@@ -1,0 +1,3 @@
+
+#cflags:=$(cflags) -Dmemmin -fprofile-arcs -ftest-coverage
+cflags:=$(cflags) -Dmemmin -Dflashmin -Dmmq_dump_enable=0

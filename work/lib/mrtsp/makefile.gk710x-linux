@@ -1,0 +1,25 @@
+ifeq ($(strip $(goke_sdk_root)),)
+  goke_sdk_root=/root/project/src/kernel/gk710x
+endif
+
+ifeq ($(strip $(goke_tool_chain_root)),)
+  goke_tool_chain_root=/opt/goke/ct_uClibc/4.6.1
+endif
+
+ifeq ($(filter armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+
+
+cflags:=$(cflags) -D__gk710x__ -D__embed_dev__ 
+ldflags:=$(ldflags)
+ 
+cross_compile:=$(goke_tool_chain_root)/usr/bin/arm-linux-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

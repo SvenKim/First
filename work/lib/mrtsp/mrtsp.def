@@ -1,0 +1,9 @@
+EXPORTS
+	rtsp_mod_create
+	rtsp_mod_destroy
+	rtsp_mod_wait
+	rtsp_session_create
+	rtsp_session_destroy
+	rtsp_session_update
+	rtsp_session_send_media_data
+    rtsp_session_ctrl

@@ -1,0 +1,25 @@
+ifeq ($(strip $(msc3xx_sdk_root)),)
+  msc3xx_sdk_root=/root/project/src/kernel/msc3xx
+endif
+
+ifeq ($(strip $(msc3xx_tool_chain_root)),)
+  msc3xx_tool_chain_root=/opt/arm-linux-gnueabihf-4.8.3-201404
+endif
+
+ifeq ($(filter armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+
+
+cflags:=$(CFLAGS) $(cflags)  -D__msc3xx__ -D__embed_dev__
+ldflags:=$(LDFLAGS) $(ldflags)
+
+cross_compile:=$(msc3xx_tool_chain_root)/bin/arm-linux-gnueabihf-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

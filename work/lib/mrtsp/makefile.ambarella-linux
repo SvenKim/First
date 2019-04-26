@@ -1,0 +1,31 @@
+
+ifeq ($(strip $(ambarella_sdk_root)),)
+  ambarella_sdk_root=/ambarella
+endif
+#export PATH=$(ambarella_sdk_root)/arm-i686/bin:$PATH
+ifeq ($(strip $(ambarella_tool_chain_root)),)
+  ambarella_tool_chain_root=$(ambarella_sdk_root)/arm-i686
+endif
+ifeq ($(strip $(ambarella_linux_sysroot)),)
+  ambarella_linux_sysroot=$(ambarella_tool_chain_root)/arm-none-linux-gnueabi
+endif
+ifeq ($(strip $(ambarella_linux_kernel_src_path)),)
+   ambarella_linux_kernel_src_path=$(frameworks_root)/../ambarella/arm-linux-2.6.38
+endif
+
+ifeq ($(filter armv4 armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__ambarella__ -I$(ambarella_module_path)/include
+
+ldflags:=$(ldflags)
+
+cross_compile:=$(ambarella_tool_chain_root)/bin/arm-none-linux-gnueabi-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

@@ -1,0 +1,49 @@
+
+ifeq ($(strip $(sdk_root)),)
+  sdk_root=/root/project/src/kernel/fh8620rt/
+endif
+ifeq ($(strip $(tool_chain_root)),)
+  tool_chain_root=/opt/fullhan/toolchain
+endif
+ifeq ($(strip $(kernel_root)),)
+   kernel_root=$(frameworks_root)/../kernel/fh8620rt/
+endif
+ifeq ($(strip $(kernel_src_path)),)
+   kernel_src_path=$(kernel_root)/bsp/rt-thread
+endif
+
+#arm1176
+ifeq ($(filter armv6,$(target_arch)),)
+  target_arch:=armv6
+endif
+
+     #-I$(kernel_src_path)/kernel/components/libc/minilibc
+cflags:=$(cflags) -D__rtthread__ -D__embed_dev__ -D__fh8620__ \
+     -DRT_USING_NEWLIB  \
+     -I$(kernel_src_path)/kernel/include \
+     -I$(kernel_src_path)/kernel/components/libc/newlib \
+     -I$(kernel_src_path)/kernel/components/pthreads \
+     -I$(kernel_src_path)/kernel/components/dfs/include \
+     -I$(kernel_src_path)/kernel/components/finsh \
+     -I$(kernel_src_path)/kernel/components/CMSIS/Include \
+     -I$(kernel_src_path)/kernel/components/net/lwip-1.4.1/src/include \
+     -I$(kernel_src_path)/kernel/components/net/lwip-1.4.1/src/include/ipv4 \
+     -I$(kernel_src_path)/kernel/components/net/lwip-1.4.1/src \
+     -I$(kernel_src_path)/kernel/components/net/lwip-1.4.1/src/arch/include \
+     -I$(kernel_src_path)/Libraries/inc \
+     -I$(kernel_src_path)/extlib/inc \
+     -I$(kernel_src_path)/platform \
+     -I$(kernel_root)/demo/inc \
+		 -I/root/project/src/apps/tool/test/sdev \
+     -I$(kernel_src_path)
+
+ldflags:=$(ldflags) -L$(kernel_src_path)/extlib
+
+cross_compile:=$(tool_chain_root)/arm-2013.11/bin/arm-none-eabi-
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+

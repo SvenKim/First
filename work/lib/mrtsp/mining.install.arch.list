@@ -1,0 +1,8 @@
+#arch-name install-method[xcopy|copy]
+universal copy
+#win32-x86 copy
+#linux-x86 copy
+#ios-armv6 copy
+#ios-armv7 copy
+#ios-i386 copy
+#ios-universal copy

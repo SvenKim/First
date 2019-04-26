@@ -1,0 +1,45 @@
+
+ifeq ($(strip $(gm828x_sdk_root)),)
+  gm828x_sdk_root=/faraday
+endif
+ifeq ($(strip $(gm828x_tool_chain_root)),)
+  gm828x_tool_chain_root=$(gm828x_sdk_root)/toolchain_gnueabi-4.4.0_ARMv5TE
+endif
+ifeq ($(strip $(gm828x_linux_sysroot)),)
+  gm828x_linux_sysroot=$(gm828x_tool_chain_root)/usr/arm-linux/sysroot
+endif
+ifeq ($(strip $(gm828x_linux_kernel_root)),)
+   gm828x_linux_kernel_root=$(frameworks_root)/../kernel/gm828x
+endif
+ifeq ($(strip $(gm828x_linux_kernel_src_path)),)
+   gm828x_linux_kernel_src_path=$(gm828x_linux_kernel_root)/arm-linux-3.3/
+endif
+ifeq ($(strip $(gm828x_linux_kernel_module_src_path)),)
+  gm828x_linux_kernel_module_src_path=$(gm828x_linux_kernel_src_path)/module
+endif
+ifeq ($(strip $(gm828x_lib_path)),)
+   gm828x_lib_path=$(gm828x_linux_kernel_root)/gm_graph/gm_lib
+endif
+
+ifeq ($(filter armv4 armv5 armv6,$(target_arch)),)
+  target_arch:=armv5
+endif
+
+cflags:=$(cflags) -D__gm828x__ -D__embed_dev__ -I$(gm828x_linux_sysroot)/include \
+	-I$(gm828x_lib_path)/inc -I$(gm828x_linux_kernel_module_src_path)/include \
+ -fno-omit-frame-pointer
+
+ldflags:=$(ldflags) -L${gm828x_linux_sysroot}/lib -L${gm828x_lib_path}/lib
+
+ifeq ($(filter toolchain_gnueabi-4.4.0_ARMv5TE,$(LD_LIBRARY_PATH)),)
+  cross_compile:=LD_LIBRARY_PATH=$(gm828x_tool_chain_root)/usr/lib:$(LD_LIBRARY_PATH) $(gm828x_tool_chain_root)/usr/bin/arm-linux-
+else
+  cross_compile:=$(gm828x_tool_chain_root)/usr/bin/arm-linux-
+endif
+
+cc:=$(cross_compile)gcc
+as:=$(cross_compile)gcc
+ar:=$(cross_compile)ar
+ranlib:=$(cross_compile)ranlib
+cxx:=$(cross_compile)g++
+
